@@ -9,7 +9,7 @@ class FormatadorDataFrame:
             primeira_linha = df.iloc[0]
             df = df.iloc[1:].copy()
     
-            for i in range(len(cabecalho)):
+            for i in range(len(cabecalho), -1, -1):
                 if "TOTAL GERAL" in cabecalho[i]:
                     cabecalho[i] = primeira_linha[cabecalho[i]]
     

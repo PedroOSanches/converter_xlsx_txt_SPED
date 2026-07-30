@@ -27,7 +27,7 @@ class Conversor:
             raise ErrorSelecao("Arquivos não selecionados:", "O programa será encerrado.")
 
         
-        dataframes = leitor.obter_arquivos(arquivos=arquivos)
+        dataframes = leitor.obter_dataframes(arquivos=arquivos)
 
         diretorio_destino = seletor.selecionar_diretorio("Conversor XLSX - TXT Formato SPED: Selecione o diretório destino.")
 
