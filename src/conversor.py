@@ -35,12 +35,12 @@ class Conversor:
         if diretorio_destino is None:
             raise ErrorSelecao("Diretório destino não selecionado:", "O programa será encerrado.")
         
-        for df in dataframes:
-            formatador = FormatadorDataFrame.gera_formatador(dataframes[df], tipo)
-            dataframes[df] = formatador.formatar_dataframe(dataframes[df])
-            gerador.gerar_csv_sped(
-                df,
-                dataframes[df], 
+        for df_key in dataframes:
+            formatador = FormatadorDataFrame.gera_formatador(dataframes[df_key], tipo)
+            dataframes[df_key] = formatador.formatar_dataframe(dataframes[df_key])
+            gerador.gerar(
+                df_key,
+                dataframes[df_key], 
                 diretorio_destino,
                 tipo
                 )

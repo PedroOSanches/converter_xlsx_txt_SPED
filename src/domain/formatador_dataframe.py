@@ -36,21 +36,27 @@ class FormatadorDataFrameInventario(FormatadorDataFrame):
 
         def __init__(self, df: DataFrame):
             super().__init__(df)
-            self.primeira_linha = 7
-            self.segunda_linha = 8
+            self.primeira_linha = 6
+            self.segunda_linha = 7
             self.corte_final = -1
+            self.colunas_indesejadas = ["ICMS Recuperavel", "Total S/ ICMS P/ fins de I.R."]
 
         @override
         def formatar_dataframe(self, df: DataFrame):
+            print("Formatando DataFrame do tipo INVENTARIO...\n", df)
             df = self.formatar_cabecalho(df)
-            df = df.iloc[self.segunda_linha + 1:self.corte_final]
+            df = df.iloc[self.segunda_linha + 1 :self.corte_final]
+            df = df.drop(columns=self.colunas_indesejadas, errors='ignore')
+            print("DataFrame formatado com sucesso.\n", df)
             return df
 
         @override
         def formatar_cabecalho(self, df: DataFrame) -> DataFrame:
             cabecalho: List[str] = []
             primeira_linha: pd.Series = df.iloc[self.primeira_linha]
+            print(f"Primeira linha: Index{primeira_linha.name}\n", primeira_linha)
             segunda_linha: pd.Series = df.iloc[self.segunda_linha]
+            print(f"Segunda linha: Index{segunda_linha.name}\n", segunda_linha)
 
             for i in range(len(df.columns)):
 
@@ -60,6 +66,7 @@ class FormatadorDataFrameInventario(FormatadorDataFrame):
                     cabecalho.append(str(primeira_linha.iloc[i]))
 
             df.columns = cabecalho
+            print("Cabeçalho formatado com sucesso.\n", df)
             return df
 
 class FormatadorDataFrameCubo(FormatadorDataFrame):

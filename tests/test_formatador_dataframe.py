@@ -7,7 +7,7 @@ from src.domain.formatador_dataframe import FormatadorDataFrame
 class Test_FormatadorDataFrame:
 
     def test_formatador_cabecalho_inventario(self):
-        df: DataFrame = pd.read_excel('tests/test_files/inventario.xlsx', header=None)
+        df: DataFrame = pd.read_excel('tests/test_files/inventario.xlsx')
         formatador = FormatadorDataFrame.gera_formatador(df, TipoFormatacao.INVENTARIO)
         df = formatador.formatar_cabecalho(df)
         cabecalho = df.columns.tolist()
@@ -17,7 +17,7 @@ class Test_FormatadorDataFrame:
         assert cabecalho == ['NCM', 'Código', 'Discriminação', 'UN', 'Quant.', 'Unitário', 'Total', 'ICMS Recuperavel', 'Total S/ ICMS P/ fins de I.R.']
 
     def test_formatar_dataframe_inventario(self):
-        df: DataFrame = pd.read_excel('tests/test_files/inventario.xlsx', header=None)
+        df: DataFrame = pd.read_excel('tests/test_files/inventario.xlsx')
         formatador = FormatadorDataFrame.gera_formatador(df, TipoFormatacao.INVENTARIO)
         df = formatador.formatar_dataframe(df)
         df_primeira_linha = df.iloc[0].tolist()
