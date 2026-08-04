@@ -26,9 +26,19 @@ class FormatadorDataFrame(ABC):
     def formatar_dataframe(self, df: DataFrame) -> DataFrame:
         pass
 
-    @classmethod
-    def gera_formatador(cls, df: DataFrame, tipo: TipoFormatacao) -> FormatadorDataFrame:
-        return FormatadorDataFrameInventario(df) if tipo == TipoFormatacao.INVENTARIO else FormatadorDataFrameCubo(df)
+
+class FormatadorDataFrameFactory:
+
+    @staticmethod
+    def criar_formatador(tipo: TipoFormatacao, df: DataFrame) -> FormatadorDataFrame:
+        if tipo == TipoFormatacao.INVENTARIO:
+            return FormatadorDataFrameInventario(df)
+        elif tipo == TipoFormatacao.CUBO:
+            return FormatadorDataFrameCubo(df)
+        elif tipo == TipoFormatacao.SPED:
+            return FormatadorDataFrameSPED(df)
+        else:
+            raise ValueError(f"Tipo de formatação inválido: {tipo}")
 
 
 
@@ -47,7 +57,7 @@ class FormatadorDataFrameInventario(FormatadorDataFrame):
             df = self.formatar_cabecalho(df)
             df = df.iloc[self.segunda_linha + 1 :self.corte_final]
             df = df.drop(columns=self.colunas_indesejadas, errors='ignore')
-            print("DataFrame formatado com sucesso.\n", df)
+            print("DataFrame formatado com sucesso.\n", df.iloc[0].to_list())
             return df
 
         @override
@@ -96,3 +106,59 @@ class FormatadorDataFrameCubo(FormatadorDataFrame):
 
         df.columns = cabecalho
         return df
+
+
+
+class FormatadorDataFrameSPED(FormatadorDataFrameCubo):
+    def __init__(self, df: DataFrame):
+        super().__init__(df)
+
+
+    @override
+    def formatar_dataframe(self, df: DataFrame) -> DataFrame:
+        df = super().formatar_dataframe(df)
+
+        new_df = df.copy()
+        new_df.insert(0, "REG", "H010")
+
+
+        new_df = new_df.rename(columns={
+            'CODIGO': "COD_ITEM", 
+            'TUNIDADE': "UNID",
+            'QTDESTOQUE': "QTD",
+            'NPRECOCUSTO': "VL_UNIT",
+            'NPRECOCUSTOTOTAL': "VL_ITEM",
+            'DESCRICAO': "TXT_COMPL"
+            })
+
+        new_df["IND_PROP"] = 0
+        new_df["QTD"] = new_df["QTD"].round(3)
+        new_df["VL_UNIT"] = new_df["VL_UNIT"].round(6)
+        new_df["VL_ITEM"] = new_df["VL_ITEM"].round(2)
+        new_df["VL_ITEM_IR"] = new_df["VL_ITEM"].round(2)
+
+        new_df = new_df.drop(
+            columns=[
+                'CST', 
+                'ICMS', 
+                'VALORICMS', 
+                'Codigo de Barras'
+                ]
+            )
+        new_df = new_df[
+        [
+            "REG",
+            "COD_ITEM",
+            "UNID",
+            "QTD",
+            "VL_UNIT",
+            "VL_ITEM",
+            "IND_PROP",
+            "TXT_COMPL",
+            "VL_ITEM_IR"
+        ]
+    ]
+
+        print(new_df.iloc[-1].to_list())
+
+        return new_df
