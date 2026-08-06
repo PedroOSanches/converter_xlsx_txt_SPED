@@ -20,7 +20,7 @@ class GeradorSped:
 
         with open(path_txt, "w", encoding="utf-8") as arquivo:
 
-            if type != TipoFormatacao.CUBO:
+            if type == TipoFormatacao.INVENTARIO:
                 arquivo.write(
                     "|" + "|".join(map(str, df.columns)) + "|\n"
                 )
@@ -30,7 +30,7 @@ class GeradorSped:
                     "|" + "|".join(map(str, linha)) + "|\n"
                 )
 
-        if type != TipoFormatacao.CUBO:
+        if type == TipoFormatacao.INVENTARIO:
             df.to_excel(
                 path_xlsx,
                 index=False,

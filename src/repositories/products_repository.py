@@ -7,7 +7,7 @@ class ProductRepository:
 
     
     def __init__(self) -> None:
-        self.__caminho__ = (Path(__file__).parent.parent / "data" / "products.json" )
+        self.__caminho__ = (Path(__file__).parent.parent / "data" / "config.json" )
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         return self.obter_produtos

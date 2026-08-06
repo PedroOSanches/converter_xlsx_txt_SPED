@@ -11,8 +11,8 @@ from src.services.leitor_excel import LeitorExcel
 from src.services.gerador_sped import GeradorSped
 from src.services.formatador_dataframe import FormatadorDataFrameFactory
 from src.exception.error_selecao import ErrorSelecao
-
-
+from src.services.descobre_empresa import CompanyService
+from src.services.concatenador_dataframes import ConcatenadorDataFrames
 class Conversor:
 
     @classmethod
@@ -34,13 +34,12 @@ class Conversor:
 
         if diretorio_destino is None:
             raise ErrorSelecao("Diretório destino não selecionado:", "O programa será encerrado.")
-        
-        for df_key in dataframes:
-            formatador = FormatadorDataFrameFactory.criar_formatador(tipo, dataframes[df_key])
-            dataframes[df_key] = formatador.formatar_dataframe(dataframes[df_key])
-            gerador.gerar(
-                df_key,
-                dataframes[df_key], 
-                diretorio_destino,
-                tipo
-                )
+
+        dataframes_por_empresa = CompanyService().descobre_empresa(dataframes)
+
+        for empresa, dataframes in dataframes_por_empresa.items():
+            for i, df in enumerate(dataframes):
+                formatador = FormatadorDataFrameFactory.criar_formatador(tipo, df)
+                dataframes[i] = formatador.formatar_dataframe(df)
+            concatenador = ConcatenadorDataFrames()
+            df_concat = concatenador.concatena_dataframes(dataframes, tipo)

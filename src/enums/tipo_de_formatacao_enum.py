@@ -1,6 +1,35 @@
 from enum import Enum
+from dataclasses import dataclass
+from collections.abc import Callable
+from pandas import DataFrame
+
+@dataclass
+class ConfigFormatacoes:
+    nome: str
+    coluna_chave: str | None = None
+    colunas_soma: set[str] | None = None
+    colunas_recalcular: dict[str, Callable[[DataFrame], DataFrame]] | None = None
+
+
+
 
 class TipoFormatacao(Enum):
-    CUBO = "Cubo"
-    INVENTARIO = "Livro Inventário"
-    SPED = "SPED"
+
+    CUBO = ConfigFormatacoes(
+        nome="Cubo"
+    )
+
+    INVENTARIO = ConfigFormatacoes(
+        nome="Livro Inventário"
+    )
+
+    SPED = ConfigFormatacoes(
+        nome="SPED",
+        coluna_chave="COD_ITEM",
+        colunas_soma={"QTD"},
+        colunas_recalcular={
+            "VL_ITEM": lambda df: df.assign(
+                VL_ITEM=df["QTD"] * df["VL_UNIT"]
+            )
+        }
+    )
