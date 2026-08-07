@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter.ttk import Combobox, Button
+
 from enum import Enum
-from src.enums.tipo_de_formatacao_enum import TipoFormatacao
+from ..enums.tipo_de_formatacao_enum import TipoFormatacao
 
 class SeletorTipoArquivo:
 
@@ -10,12 +11,12 @@ class SeletorTipoArquivo:
         root.title("Selecione o tipo de Relatório para ser formatado.")
         root.geometry("300x150")
         selecao = tk.StringVar()
-        selecao.set(value=TipoFormatacao.CUBO.value)
+        selecao.set(value=TipoFormatacao.CUBO.value.nome)
 
         combo = Combobox(
             root,
             textvariable=selecao,
-            values=[tipo.value for tipo in TipoFormatacao],
+            values=[tipo.value.nome for tipo in TipoFormatacao],
             state="readonly"
         )
 
@@ -28,4 +29,9 @@ class SeletorTipoArquivo:
         ).pack(pady=10)
         
         root.mainloop()
-        return TipoFormatacao(selecao.get())
+        return next(
+                tipo
+                for tipo in TipoFormatacao
+                if tipo.value.nome == selecao.get()
+                )
+    

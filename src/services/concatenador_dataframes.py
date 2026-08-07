@@ -1,52 +1,63 @@
-import abc
-from abc import abstractmethod
 import pandas as pd
 from pandas import DataFrame
 from typing import List, Dict
 from collections.abc import Callable
 
 
+from ..services.formatador_dataframe import FormatadorDataFrame
+from ..enums.tipo_de_formatacao_enum import TipoFormatacao, ConfigFormatacoes
 
-from ..enums.tipo_de_formatacao_enum import TipoFormatacao
 
-
-class ConcatenadorDataFrames(abc.ABC):
+class ConcatenadorDataFrames:
 
     def concatena_dataframes(
-            self, 
-            dataframes: List[DataFrame], 
-            config: dict
-            ):
-        df_concatenado = pd.concat(dataframes, ignore_index=True)
+        self,
+        dataframes: list[DataFrame],
+        config: ConfigFormatacoes
+    ) -> DataFrame:
 
-        return self.agrupa_dataframe(df_concatenado, config)
+        df = pd.concat(
+            dataframes,
+            ignore_index=True
+        )
+
+        return self.agrupa_dataframe(df, config)
+
 
     def agrupa_dataframe(
-            self, 
-            dataframe: DataFrame, 
-            config: dict
-            ):
+        self,
+        dataframe: DataFrame,
+        config: ConfigFormatacoes
+    ) -> DataFrame:
 
-        coluna_chave = config["coluna_chave"]
-        colunas_soma = config["coluna_soma"]
+        if config.coluna_chave is None:
+            return dataframe
+
+        colunas_soma = config.colunas_soma or set()
 
         agregacoes = {
             coluna: (
-                "sum" 
+                "sum"
                 if coluna in colunas_soma
                 else "first"
             )
             for coluna in dataframe.columns
-            if coluna != coluna_chave
+            if coluna != config.coluna_chave
         }
 
         dataframe = (
             dataframe
-            .groupby(coluna_chave, as_index=False)
+            .groupby(config.coluna_chave, as_index=False)
             .agg(agregacoes)
-            )
+        )
 
-        for coluna, funcao in config["colunas_recalcular"].items():
+        for funcao in (config.colunas_recalcular or {}).values():
             dataframe = funcao(dataframe)
+
+        if config.ordem_colunas:
+            dataframe = FormatadorDataFrame.reordena_dataframe(
+                dataframe,
+                config.ordem_colunas
+            )
 
         return dataframe

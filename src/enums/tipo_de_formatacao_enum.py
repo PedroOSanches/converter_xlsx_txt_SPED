@@ -9,8 +9,7 @@ class ConfigFormatacoes:
     coluna_chave: str | None = None
     colunas_soma: set[str] | None = None
     colunas_recalcular: dict[str, Callable[[DataFrame], DataFrame]] | None = None
-
-
+    ordem_colunas: list[str] | None = None
 
 
 class TipoFormatacao(Enum):
@@ -31,5 +30,16 @@ class TipoFormatacao(Enum):
             "VL_ITEM": lambda df: df.assign(
                 VL_ITEM=df["QTD"] * df["VL_UNIT"]
             )
-        }
+        },
+        ordem_colunas=[
+                    "REG",
+                    "COD_ITEM",
+                    "UNID",
+                    "QTD",
+                    "VL_UNIT",
+                    "VL_ITEM",
+                    "IND_PROP",
+                    "TXT_COMPL",
+                    "VL_ITEM_IR"
+                ]
     )

@@ -26,9 +26,8 @@ class GeradorSped:
                 )
 
             for linha in df.itertuples(index=False, name=None):
-                arquivo.write(
-                    "|" + "|".join(map(str, linha)) + "|\n"
-                )
+                arquivo.write("|" + "|".join("" if pd.isna(valor) else str(valor) for valor in linha) + "|\n"
+)
 
         if type == TipoFormatacao.INVENTARIO:
             df.to_excel(

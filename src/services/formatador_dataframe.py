@@ -2,7 +2,7 @@ import pandas as pd
 from pandas import DataFrame
 from typing import List, Dict, override
 from abc import ABC, abstractmethod
-
+from datetime import date
 from src.enums.tipo_de_formatacao_enum import TipoFormatacao
 
 
@@ -23,8 +23,11 @@ class FormatadorDataFrame(ABC):
     def formatar_cabecalho(self, df: DataFrame) -> DataFrame:
         pass
     @abstractmethod
-    def formatar_dataframe(self, df: DataFrame) -> DataFrame:
+    def formatar_dataframe(self) -> DataFrame:
         pass
+    @classmethod
+    def reordena_dataframe(cls, df: DataFrame, ordem_colunas: list[str]):
+        return df[ordem_colunas] 
 
 
 class FormatadorDataFrameFactory:
@@ -52,7 +55,8 @@ class FormatadorDataFrameInventario(FormatadorDataFrame):
             self.colunas_indesejadas = ["ICMS Recuperavel", "Total S/ ICMS P/ fins de I.R."]
 
         @override
-        def formatar_dataframe(self, df: DataFrame):
+        def formatar_dataframe(self):
+            df = self.df
             print("Formatando DataFrame do tipo INVENTARIO...\n", df)
             df = self.formatar_cabecalho(df)
             df = df.iloc[self.segunda_linha + 1 :self.corte_final]
@@ -87,7 +91,8 @@ class FormatadorDataFrameCubo(FormatadorDataFrame):
         self.corte_final = -5
 
     @override
-    def formatar_dataframe(self, df: DataFrame):
+    def formatar_dataframe(self):
+        df = self.df
         df = self.formatar_cabecalho(df)
         df = df.iloc[self.primeira_linha + 1 :self.corte_final]
         return df
@@ -115,8 +120,8 @@ class FormatadorDataFrameSPED(FormatadorDataFrameCubo):
 
 
     @override
-    def formatar_dataframe(self, df: DataFrame) -> DataFrame:
-        df = super().formatar_dataframe(df)
+    def formatar_dataframe(self) -> DataFrame:
+        df = super().formatar_dataframe()
 
         new_df = df.copy()
         new_df.insert(0, "REG", "H010")
@@ -158,7 +163,4 @@ class FormatadorDataFrameSPED(FormatadorDataFrameCubo):
             "VL_ITEM_IR"
         ]
     ]
-
-        print(new_df.iloc[-1].to_list())
-
         return new_df
